@@ -4,7 +4,7 @@ using static SquidEyes.UrlBundler.Common.Models.UrlInfoStatus;
 
 namespace SquidEyes.UrlBundler.Common.Models;
 
-[CustomValidation(typeof(UrlInfo), "ValidateStatusTitleExcerptAndThumbUri")]
+[CustomValidation(typeof(UrlInfo), "ValidateStatusTitleAndExcerpt")]
 public class UrlInfo
 {
     [Required]
@@ -12,8 +12,8 @@ public class UrlInfo
     public Uri? Uri { get; init; }
 
     [Required]
-    [Slug("Code", 25)]
-    public string? Code { get; init; }
+    [Slug("Alias", 25)]
+    public string? Alias { get; init; }
 
     [Slug("Group", 25)]
     public string? Group { get; init; }
@@ -24,28 +24,24 @@ public class UrlInfo
     [NonEmptyAndTrimmed]
     public string? Excerpt { get; set; }
 
-    [AbsoluteUri]
-    public Uri? ThumbUri { get; set; }
-
     [Required]
     [EnumValue(typeof(UrlInfoStatus))]
     public UrlInfoStatus Status { get; set; } = New;
 
-    public static ValidationResult ValidateStatusTitleExcerptAndThumbUri(
+    public static ValidationResult ValidateStatusTitleAndExcerpt(
         UrlInfo info, ValidationContext _)
     {
-        var prefix = $"{nameof(Title)}, {nameof(Excerpt)} and {nameof(ThumbUri)}";
+        var prefix = $"{nameof(Title)} and {nameof(Excerpt)}";
 
         ValidationResult GetErrorResult(string setTo) => new(
             $"The {prefix} properties must be set to {setTo} when {nameof(Status)} is set to {info.Status}.",
-                new List<string> { nameof(Title), nameof(Excerpt), nameof(ThumbUri) });
+                new List<string> { nameof(Title), nameof(Excerpt) });
 
         var hasTitle = !string.IsNullOrWhiteSpace(info.Title);
         var hasExcerpt = !string.IsNullOrWhiteSpace(info.Excerpt);
-        var hasThumbUri = info.ThumbUri != null;
 
-        var hasAny = hasTitle || hasExcerpt || hasThumbUri;
-        var hasAll = hasTitle && hasExcerpt && hasThumbUri;
+        var hasAny = hasTitle || hasExcerpt;
+        var hasAll = hasTitle && hasExcerpt;
 
         return (info.Status, hasAny, hasAll) switch
         {

@@ -11,6 +11,20 @@ internal static class MiscExtenders
     private static readonly Regex isEmailAddress = new(
         @"(?!.*\.\.)(^[^\.][^@\s]+@[^@\s]+\.[^@\s\.]+$)", RegexOptions.Compiled);
 
+    public static bool IsAlias(this string value)
+    {
+        if (value == null)
+            return false;
+
+        if (value.Length != AliasGenerator.Length)
+            return false;
+
+        if (value.Any(c => !AliasGenerator.ValidChars.Contains(c)))
+            return false;
+
+        return true;
+    }
+
     public static bool IsUnique<T>(this IEnumerable<T> values) =>
         values.All(new HashSet<T>().Add);
 

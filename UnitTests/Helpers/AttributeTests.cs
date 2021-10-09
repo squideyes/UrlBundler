@@ -9,6 +9,10 @@ namespace SquidEyes.UnitTests
 {
     public class AttributeTests
     {
+        private class TestInstance
+        {
+        }
+
         private enum Color
         {
             Red = 1,
@@ -26,9 +30,9 @@ namespace SquidEyes.UnitTests
 
             var attrib = new AbsoluteUriAttribute();
 
-            var result = attrib.GetValidationResult(uri, new ValidationContext(uri))!;
+            var result = attrib.GetValidationResult(uri, GetContext())!;
 
-            Validate(result, isValid, "The  property must be set to an absolute Uri.");
+            Validate(result, isValid, MustBeSetTo("an absolute Uri."));
         }
 
         [Theory]
@@ -54,10 +58,9 @@ namespace SquidEyes.UnitTests
         {
             var attrib = new UrlBundler.Common.Helpers.EmailAddressAttribute(20);
 
-            var result = attrib.GetValidationResult(
-                value, new ValidationContext(value))!;
+            var result = attrib.GetValidationResult(value, GetContext())!;
 
-            Validate(result, isValid, "The  property must be set to a valid email address.");
+            Validate(result, isValid, MustBeSetTo("a valid email address."));
         }
 
         [Theory]
@@ -69,16 +72,17 @@ namespace SquidEyes.UnitTests
 
             var value = isValid ? Color.Red : 0;
 
-            var result = attrib.GetValidationResult(
-                value, new ValidationContext(value))!;
+            var result = attrib.GetValidationResult(value, GetContext())!;
 
-            Validate(result, isValid, "The  property must be set to a defined SquidEyes.UnitTests.AttributeTests+Color.");
+            Validate(result, isValid, MustBeSetTo(
+                "a defined SquidEyes.UnitTests.AttributeTests+Color."));
         }
 
         [Theory]
         [InlineData(true, false, true)]
         [InlineData(false, false, false)]
         [InlineData(false, true, true)]
+        [InlineData(true, true, false)]
         public void HasNonDefaultItemsAttributeShouldWork(
             bool isNull, bool hasItems, bool isValid)
         {
@@ -94,12 +98,66 @@ namespace SquidEyes.UnitTests
                     list.Add("ABC123");
             }
 
-            var result = attrib.GetValidationResult(
-                list, new ValidationContext(this))!;
+            var result = attrib.GetValidationResult(list, GetContext())!;
+
+            if (result == ValidationResult.Success)
+                return;
 
             Validate(result, isValid,
-                "The  property must be set to a collection with one or more non-default elements.");
+                MustBeSetTo("a collection with one or more non-default elements."));
         }
+
+        [Theory]
+        [InlineData(null, true)]
+        [InlineData("", false)]
+        [InlineData(" ", false)]
+        [InlineData("ABC ", false)]
+        [InlineData(" ABC", false)]
+        public void NonEmptyAndTrimmedAttributeShouldWork(string value, bool isValid)
+        {
+            var attrib = new NonEmptyAndTrimmedAttribute();
+
+            var result = attrib.GetValidationResult(value, GetContext())!;
+
+            Validate(result, isValid, MustBeSetTo("a trimmed non-empty string."));
+        }
+
+        [Theory]
+        [InlineData("ABC123", true)]
+        [InlineData(null, true)]
+        [InlineData("", false)]
+        [InlineData(" ", false)]
+        [InlineData("ABC123 ", false)]
+        [InlineData(" ABC123", false)]
+        [InlineData("XXXXXXXXXXX", false)]
+        public void SlugAttributeShouldWork(string value, bool isValid)
+        {
+            var attrib = new SlugAttribute("TEST", 10);
+
+            var result = attrib.GetValidationResult(value, GetContext())!;
+
+            Validate(result, isValid, MustBeSetTo("a valid TEST."));
+        }
+
+        [Theory]
+        [InlineData(DateTimeKind.Utc, true)]
+        [InlineData(DateTimeKind.Unspecified, false)]
+        [InlineData(DateTimeKind.Local, false)]
+        public void UtcDateTimeAttributeShoudlWork(DateTimeKind kind, bool isValid)
+        {
+            var attrib = new UtcDateTimeAttribute();
+
+            var value = new DateTime(2021, 1, 1, 0, 0, 0, kind);
+
+            var result = attrib.GetValidationResult(value, GetContext())!;
+
+            Validate(result, isValid, MustBeSetTo("a UTC date/time."));
+        }
+
+        private static string MustBeSetTo(string suffix) => 
+            $"The  property must be set to {suffix}";
+
+        private static ValidationContext GetContext() => new(new TestInstance());
 
         private static void Validate(ValidationResult result, bool isValid, string message)
         {

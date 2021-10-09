@@ -12,7 +12,7 @@ public class UrlInfoSet
     public string? UserName { get; init; }
 
     [Required]
-    [Slug("UrlSetId", SLUG_MAXLENGTH)]
+    [Slug("UrlInfoSetId", SLUG_MAXLENGTH)]
     public string? UrlSetId { get; init; }
 
     [Required]
