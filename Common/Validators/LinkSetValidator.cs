@@ -11,7 +11,7 @@ namespace SquidEyes.UrlBundler.Common.Validators
             RuleFor(ls => ls.LinkSetId)
                 .Cascade(CascadeMode.Stop)
                 .NotEmpty()
-                .Slug(LinkSet.Known.MaxLengths.LinkSetId);
+                .Slug(LinkSet.Known.MaxLengths.LinkSetId, SlugCase.AlphaDigitDash);
 
             RuleFor(ls => ls.UserName)
                 .Cascade(CascadeMode.Stop)
@@ -21,7 +21,7 @@ namespace SquidEyes.UrlBundler.Common.Validators
             RuleFor(ls => ls.Title)
                 .Cascade(CascadeMode.Stop)
                 .NotEmpty()
-                .NonEmptyAndTrimmed(LinkSet.Known.MaxLengths.Title, false);
+                .Trimmed(LinkSet.Known.MaxLengths.Title);
         }
     }
 }

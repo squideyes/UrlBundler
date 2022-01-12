@@ -11,12 +11,12 @@ public class GroupValidator : AbstractValidator<Group>
         RuleFor(g => g.GroupId)
             .Cascade(CascadeMode.Stop)
             .NotEmpty()
-            .Slug(Group.Known.MaxLengths.GroupId);
+            .Slug(Group.Known.MaxLengths.GroupId, SlugCase.AlphaDigitDash);
 
         RuleFor(g => g.Title)
             .Cascade(CascadeMode.Stop)
             .NotEmpty()
-            .NonEmptyAndTrimmed(Group.Known.MaxLengths.Title, false);
+            .Trimmed(Group.Known.MaxLengths.Title);
 
         RuleFor(g => g.Links)
             .Cascade(CascadeMode.Stop)

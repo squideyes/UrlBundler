@@ -1,7 +1,4 @@
-﻿using SquidEyes.UrlBundler.Common.Helpers;
-using System.ComponentModel.DataAnnotations;
-
-namespace SquidEyes.UrlBundler.Common.Models;
+﻿namespace SquidEyes.UrlBundler.Common.Models;
 
 public class LinkSet
 {
@@ -20,16 +17,4 @@ public class LinkSet
     public string? LinkSetId { get; init; }
     public string? Title { get; init; }
     public List<Group> Groups { get; init; } = new();
-
-    public static ValidationResult ValidateGroups(
-        List<Group> groups, ValidationContext context)
-    {
-        if (groups == null || groups.Count == 0)
-        {
-            return context.MustBeSetTo(
-                "a collection with one or more non-default Groups");
-        }
-
-        return ValidationResult.Success!;
-    }
 }

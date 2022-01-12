@@ -1,6 +1,4 @@
-﻿using static SquidEyes.UrlBundler.Common.Models.LinkStatus;
-
-namespace SquidEyes.UrlBundler.Common.Models;
+﻿namespace SquidEyes.UrlBundler.Common.Models;
 
 public class Link
 {
@@ -16,7 +14,8 @@ public class Link
 
     public Uri? Uri { get; init; }
     public string? Alias { get; init; }
+
     public string? Title { get; set; }
     public string? Excerpt { get; set; }
-    public LinkStatus Status { get; set; } = New;
+    public LinkStatus Status { get; set; } = LinkStatus.New;
 }
